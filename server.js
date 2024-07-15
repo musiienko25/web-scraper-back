@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // Змініть на потрібний вам URL
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
@@ -16,7 +16,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Роут для пошуку елемента за data-id
 app.get("/api/scrape", async (req, res) => {
   const { id } = req.query;
   try {
@@ -25,14 +24,21 @@ app.get("/api/scrape", async (req, res) => {
     );
     const $ = cheerio.load(data);
 
-    const element = $(`[data-id="${id}"]`);
-    if (element.length === 0) {
+    let elementHtml = null;
+    $("table tbody tr").each((i, row) => {
+      const rowId = $(row).find("td").eq(1).text().trim();
+      if (rowId === id) {
+        elementHtml = $(row).html();
+        return false;
+      }
+    });
+
+    if (!elementHtml) {
       return res
         .status(404)
-        .json({ error: `Element with data-id="${id}" not found.` });
+        .json({ error: `Element with ID="${id}" not found.` });
     }
 
-    const elementHtml = element.html();
     res.send(elementHtml);
   } catch (error) {
     console.error("Error scraping data:", error);
