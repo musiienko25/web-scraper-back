@@ -47,7 +47,7 @@ app.get("/api/scrape", async (req, res) => {
     if (!bidDetails) {
       return res
         .status(404)
-        .json({ error: `Element with ID="${id}" not found.` });
+        .json({ error: `Element with ID="${id}" not found` });
     }
 
     res.json(bidDetails);
