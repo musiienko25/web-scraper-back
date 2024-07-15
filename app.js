@@ -53,9 +53,7 @@ app.get("/api/scrape", async (req, res) => {
     res.json(bidDetails);
   } catch (error) {
     console.error("Error scraping data:", error);
-    res
-      .status(500)
-      .json({ error: "Error fetching data from external source." });
+    res.status(500).json({ error: "Error fetching data from external source" });
   }
 });
 
