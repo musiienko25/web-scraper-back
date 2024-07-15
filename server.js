@@ -24,22 +24,33 @@ app.get("/api/scrape", async (req, res) => {
     );
     const $ = cheerio.load(data);
 
-    let elementHtml = null;
+    let bidDetails = null;
     $("table tbody tr").each((i, row) => {
       const rowId = $(row).find("td").eq(1).text().trim();
       if (rowId === id) {
-        elementHtml = $(row).html();
+        bidDetails = {
+          id: rowId,
+          title: $(row).find("td").eq(2).text().trim(),
+          status: $(row).find("td").eq(3).text().trim(),
+          dueDate: $(row).find("td").eq(4).text().trim(),
+          publishDate: $(row).find("td").eq(5).text().trim(),
+          mainCategory: $(row).find("td").eq(6).text().trim(),
+          solicitationType: $(row).find("td").eq(7).text().trim(),
+          issuingAgency: $(row).find("td").eq(8).text().trim(),
+          bidHoldersList: $(row).find("td").eq(9).text().trim(),
+          emmId: $(row).find("td").eq(10).text().trim(),
+        };
         return false;
       }
     });
 
-    if (!elementHtml) {
+    if (!bidDetails) {
       return res
         .status(404)
         .json({ error: `Element with ID="${id}" not found.` });
     }
 
-    res.send(elementHtml);
+    res.json(bidDetails);
   } catch (error) {
     console.error("Error scraping data:", error);
     res
